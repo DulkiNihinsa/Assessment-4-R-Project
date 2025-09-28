@@ -1,0 +1,170 @@
+---
+title: "Assessment 4 Part 1"
+author: "Dulki Nihinsa Danthanarayana"
+date: "2025-09-28"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+## Downloading gene_expression.tsv data file 
+
+```{r}
+URL="https://raw.githubusercontent.com/ghazkha/Assessment4/refs/heads/main/gene_expression.tsv"
+download.file(URL,destfile="gene_expression.tsv")
+```
+The code defines the URL for a tsv file containing RNA-seq count data for three samples of interest, downloads the file as gene_expression.tsv 
+
+## Downloading growth_data.csv data file 
+
+```{r}
+URL="https://raw.githubusercontent.com/ghazkha/Assessment4/refs/heads/main/growth_data.csv"
+download.file(URL,destfile="growth_data.csv")
+```
+The code defines the URL for a csv file containing measurements for tree circumference growing at two sites, control site and treatment site which were planted 20 years ago, downloads the file as growth_data.csv 
+
+## 1. Reading Gene Expression Data and Setting Row Names
+
+```{r}
+gene_expr <- read.table("gene_expression.tsv", header=TRUE, sep="\t", row.names=1)
+```
+The read.table() import the TSV file, row.names = 1 set gene identifiers as row names.
+
+
+```{r}
+head(gene_expr)
+```
+The head(gene_expr) command display the first six rows. 
+
+## 2. Calculating Gene Mean Expression
+
+```{r}
+gene_expr$Mean <- rowMeans(gene_expr)
+```
+The mean across samples for each gene is calculated using rowMeans() and it is added as a new column named "Mean".
+
+
+```{r}
+head(gene_expr)
+```
+The head(gene_expr) command shows the first six genes with the new column added.
+
+## 3. Listing the 10 genes with the highest mean expression
+
+```{r}
+top10 <- head(gene_expr[order(-gene_expr$Mean), ], 10)
+top10
+```
+The above command sort the data frame by the new mean column in descending order.
+
+```{r}
+rownames(top10)
+```
+The above command display the names of the top 10 genes.
+
+## 4. Determining the number of genes with a mean <10
+
+```{r}
+low_genes_count <- sum(gene_expr$Mean < 10)
+low_genes_count  
+```
+The sum(gene_expr$Mean < 10) is used on the mean column to count genes with mean expression less than 10.
+
+## 5. Plotting Histogram of Mean Expression
+
+```{r}
+hist(gene_expr$Mean,
+     main="Histogram of Gene Mean Expression",
+     xlab="Mean Expression Count",
+     col="darkblue", border="black")
+```
+
+```{r}
+png("myplot.png")
+hist(gene_expr$Mean,
+     main="Histogram of Gene Mean Expression",
+     xlab="Mean Expression Count",
+     col="darkblue", border="black")
+dev.off()
+```
+The plot is saved as a PNG using png("myplot.png"). 
+
+## 6. Importing and Exploring Tree Growth Data
+
+```{r}
+growth <- read.csv("growth_data.csv", header=TRUE)
+colnames(growth)
+```
+The read.csv("growth_data.csv", header=TRUE) command import csv file and column names are display by the colnames(growth).
+
+## 7. Calculating the mean and standard deviation of tree circumference at the start and end of the study at both sites
+
+```{r}
+# Calculating mean and SD for Circumference in 2005 by Site
+
+mean_2005_northeast <- mean(subset(growth, Site == "northeast")$Circumf_2005_cm, na.rm = TRUE)
+mean_2005_northeast
+
+sd_2005_northeast <- sd(subset(growth, Site == "northeast")$Circumf_2005_cm, na.rm = TRUE)
+sd_2005_northeast
+
+mean_2005_southwest <- mean(subset(growth, Site == "southwest")$Circumf_2005_cm, na.rm = TRUE)
+mean_2005_southwest
+
+sd_2005_southwest <- sd(subset(growth, Site == "southwest")$Circumf_2005_cm, na.rm = TRUE)
+sd_2005_southwest
+
+# Calculating mean and SD for Circumference in 2020 by Site
+
+mean_2020_northeast <- mean(subset(growth, Site == "northeast")$Circumf_2020_cm, na.rm = TRUE)
+mean_2020_northeast
+
+sd_2020_northeast <- sd(subset(growth, Site == "northeast")$Circumf_2020_cm, na.rm = TRUE)
+sd_2020_northeast
+
+mean_2020_southwest <- mean(subset(growth, Site == "southwest")$Circumf_2020_cm, na.rm = TRUE)
+mean_2020_southwest
+
+sd_2020_southwest <- sd(subset(growth, Site == "southwest")$Circumf_2020_cm, na.rm = TRUE)
+sd_2020_southwest
+```
+
+## 8. Box plot of tree circumference at the start and end of the study at both sites
+
+```{r}
+# Combine start and end circumference data with Site info in long format
+circum_data <- data.frame(
+  Circumference = c(growth$Circumf_2005_cm, growth$Circumf_2020_cm),
+  Time = factor(rep(c("2005", "2020"), each = nrow(growth))),
+  Site = rep(growth$Site, 2)
+)
+
+# Create boxplot of Circumference by Site and Time
+boxplot(Circumference ~ Site + Time, data = circum_data,
+        col = c("lightblue", "pink"),
+        xlab = "Site and Time",
+        ylab = "Tree Circumference (cm)",
+        main = "Tree Circumference at Start (2005) and End (2020) of Study")
+```
+
+## 9. Calculating the mean growth over the last 10 years at each site
+
+```{r}
+# Calculating growth over last 10 years (2020 - 2010)
+growth$Growth_10yr <- growth$Circumf_2020_cm - growth$Circumf_2010_cm
+
+# Calculating mean growth by site
+mean_growth_northeast <- mean(subset(growth, Site == "northeast")$Growth_10yr, na.rm = TRUE)
+mean_growth_northeast
+
+mean_growth_southwest <- mean(subset(growth, Site == "southwest")$Growth_10yr, na.rm = TRUE)
+mean_growth_southwest
+```
+
+## 10. T-test of 10-Year Growth at Two Sites
+
+```{r}
+t_result <- t.test(Growth_10yr ~ Site, data = growth) 
+t_result
+```
+
