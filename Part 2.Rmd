@@ -1,0 +1,248 @@
+---
+title: "Assessment 4 Part 2"
+author: "Dulki Nihinsa Danthanarayana"
+date: "2025-09-28"
+output: html_document
+---
+
+## 1. Downloading Coding DNA Sequences for E. coli and Barnesiella intestinihominis
+
+```{r}
+library("R.utils")
+
+URL="https://ftp.ensemblgenomes.ebi.ac.uk/pub/bacteria/release-62/fasta/bacteria_0_collection/escherichia_coli_str_k_12_substr_mg1655_gca_000005845/cds/Escherichia_coli_str_k_12_substr_mg1655_gca_000005845.ASM584v2.cds.all.fa.gz"
+download.file(URL,destfile="ecoli_cds.fa.gz")
+gunzip("ecoli_cds.fa.gz")
+```
+The script begins by loading the R.utils library to enable file decompression. It then specifies the URL for a compressed FASTA file containing Escherichia coli coding sequences, downloads it as ecoli_cds.fa.gz, uncompresses the file using gunzip.
+
+```{r}
+library("R.utils")
+
+URL="https://ftp.ensemblgenomes.ebi.ac.uk/pub/bacteria/release-62/fasta/bacteria_114_collection/barnesiella_intestinihominis_yit_11860_gca_000296465/cds/Barnesiella_intestinihominis_yit_11860_gca_000296465.Barn_inte_YIT_11860_V1.cds.all.fa.gz"
+download.file(URL,destfile="barnesiella intestinihominis_cds.fa.gz")
+gunzip("barnesiella intestinihominis_cds.fa.gz")
+```
+The script begins by loading the R.utils library to enable file decompression. It then specifies the URL for a compressed FASTA file containing Barnesiella intestinihominis coding sequences, downloads it as barnesiella intestinihominis_cds.fa.gz, uncompresses the file using gunzip.
+
+## Number of coding sequences in E.coli
+
+```{r}
+library("seqinr")
+```
+Load the seqinr library: This library provides tools for biological sequence retrieval and analysis.
+
+```{r}
+cdse <- seqinr::read.fasta("ecoli_cds.fa")
+```
+The code reads the uncompressed FASTA file ecoli_cds.fa containing Escherichia coli coding sequences into R using the read.fasta function from the seqinr package.
+
+```{r}
+length(cdse)
+```
+The above code figure out the number of coding sequences in Escherichia coli.
+
+## Number of coding sequences in Barnesiella intestinihominis
+
+```{r}
+cdsb <- seqinr::read.fasta("barnesiella intestinihominis_cds.fa")
+```
+The code reads the uncompressed FASTA file barnesiella intestinihominis_cds.fa containing Barnesiella intestinihominis coding sequences into R using the read.fasta function from the seqinr package.
+
+```{r}
+length(cdsb)
+```
+The above code figure out the number of coding sequences in Barnesiella intestinihominis.
+
+## 3. Calculating the length of all coding sequences in E. coli and Barnesiella intestinihominis
+
+E. coli
+
+```{r}
+lene <- as.numeric(summary(cdse)[,1])
+
+sum(lene)
+```
+
+The code above extracts the lengths of genes from the cdse object by converting the first column of the summary to numeric values. It then calculates the total length of all genes by summing these values.
+
+Barnesiella intestinihominis
+
+```{r}
+lenb <- as.numeric(summary(cdsb)[,1])
+
+sum(lenb)
+```
+
+The code above extracts the lengths of genes from the cdsb object by converting the first column of the summary to numeric values. It then calculates the total length of all genes by summing these value
+
+## Boxplot of coding sequence length in E. coli
+
+```{r}
+boxplot(lene,ylab="sequence length (bp)")
+```
+This code creates a boxplot of gene lengths, labeling the y-axis as "sequence length (bp)."
+
+## Boxplot of coding sequence length in Barnesiella intestinihominis
+
+```{r}
+boxplot(lenb,ylab="sequence length (bp)")
+```
+This code creates a boxplot of gene lengths, labeling the y-axis as "sequence length (bp)."
+
+## Mean and median coding sequence length of E. coli
+
+```{r}
+mean(lene)
+```
+
+```{r}
+median(lene)
+```
+
+## Mean and median coding sequence length of Barnesiella intestinihominis
+
+```{r}
+mean(lenb)
+```
+
+```{r}
+median(lenb)
+```
+
+## 4. Calculating the frequency of DNA bases in the total coding sequences for E. coli and Barnesiella intestinihominis
+
+E. coli
+
+```{r}
+dna_E <- unlist(cdse)
+
+dna_composition_E.coli <- count(dna_E,1)
+
+barplot(dna_composition_E.coli,xlab="nucleotides",ylab="frequency", main="E coli CDS composition")
+```
+
+The code dna_E <- unlist(cdse) unlist the cdse and stores it in the dna variable and then calculates the frequency of each nucleotide using dna_composition_E.coli <- count(dna_E,1), which stores these frequencies in dna_composition_E.coli. Then this data is visualized with a barplot(dna_composition_E.coli, xlab="nucleotides", ylab="frequency", main="E coli CDS composition"). This creates a bar plot where the x-axis represents the nucleotides (A, C, G, T), the y-axis shows their frequencies, and the plot title indicates that it displays the nucleotide composition of E. coli coding sequences.
+
+
+Barnesiella intestinihominis
+
+```{r}
+dna_B <- unlist(cdsb)
+
+dna_composition_B.intestinihominis <- count(dna_B,1)
+
+barplot(dna_composition_B.intestinihominis,xlab="nucleotides",ylab="frequency", main="Barnesiella intestinihominis CDS composition")
+```
+
+The code dna_B <- unlist(cdsb) unlist the cdsb and stores it in the dna variable and then calculates the frequency of each nucleotide using dna_composition_B.intestinihominis <- count(dna_B,1), which stores these frequencies in dna_composition_B.intestinihominis. Then this data is visualized with a barplot(dna_composition_B.intestinihominis, xlab="nucleotides", ylab="frequency", main="Barnesiella intestinihominis CDS composition"). This creates a bar plot where the x-axis represents the nucleotides (A, C, G, T), the y-axis shows their frequencies, and the plot title indicates that it displays the nucleotide composition of Barnesiella intestinihominis coding sequences.
+
+## The frequency of amino acid in the total protein sequence for E. coli and Barnesiella intestinihominis
+
+E. coli
+```{r}
+prot_E.coli <- lapply(cdse, translate)
+```
+
+In the above code, lapply applies the translate function to each element of the cdse list, resulting in prot_E.coli, a list of translated protein sequences.
+
+```{r}
+amino_E <- unlist(prot_E.coli)
+
+aminoacid_composition_E.coli <- count(amino_E,wordsize=1)
+
+barplot(aminoacid_composition_E.coli,xlab="amino acids",ylab="frequency", main="E coli CDS composition")
+```
+
+Barnesiella intestinihominis
+
+```{r}
+prot_B.intestinihominis <- lapply(cdsb, translate)
+```
+
+In the above code, lapply applies the translate function to each element of the cdsb list, resulting in prot_B.intestinihominis, a list of translated protein sequences.
+
+```{r}
+amino_B <- unlist(prot_B.intestinihominis)
+
+aminoacid_composition_B.intestinihominis <- count(amino_B,wordsize=1)
+
+barplot(aminoacid_composition_B.intestinihominis,xlab="amino acids",ylab="frequency", main="Barnesiella intestinihominis CDS composition")
+```
+
+## 5. Creating a codon usage table and quantifying the codon usage bias among all coding sequences
+
+E.coli
+
+```{r}
+codon_E <- unlist(cdse)
+
+uco(codon_E,as.data.frame=TRUE)
+```
+The code codon_E <- unlist(cdse) unlist the cdse and stores it in the codon variable and then calculates the codon usage using uco(codon_E,as.data.frame=TRUE) giving the values in a data frame.
+
+```{r}
+uco(codon_E,index="rscu",as.data.frame=TRUE)
+```
+The code uco(codon_E,index="rscu",as.data.frame=TRUE) quantify the codon usage bias among all coding sequences and give the values in a data frame.
+
+Barnesiella intestinihominis
+
+```{r}
+codon_B <- unlist(cdsb)
+
+uco(codon_B,as.data.frame=TRUE)
+```
+The code codon_B <- unlist(cdsb) unlist the cdsb and stores it in the codon variable and then calculates the codon usage using uco(codon_B,as.data.frame=TRUE) giving the values in a data frame.
+
+```{r}
+uco(codon_B,index="rscu",as.data.frame=TRUE)
+```
+The code uco(codon_B,index="rscu",as.data.frame=TRUE) quantify the codon usage bias among all coding sequences and give the values in a data frame.
+
+## 6. Identifying 10 protein sequence k-mers of length 3-5 which are the most over- and under-represented k-mers in Barnesiella intestinihominis and E.coli
+
+```{r}
+# 
+prots_B.intestinihominis <- unlist(prot_B.intestinihominis)
+prots_E.coli <- unlist(prot_E.coli)
+```
+The translated protein sequences are converted to simple sequence vectors by unlist.
+
+```{r}
+# Define amino acid alphabet
+aa <- s2c("ACDEFGHIKLMNPQRSTVWY")
+
+kmers_B.intestinihominis <- list()
+kmers_E.coli <- list()
+
+for (k in 3:5) {
+  kmers_B.intestinihominis[[as.character(k)]] <- count(prots_B.intestinihominis, wordsize = k, alphabet = aa, freq = TRUE)
+
+  kmers_E.coli[[as.character(k)]] <- count(prots_E.coli, wordsize = k, alphabet = aa, freq = TRUE)
+}
+```
+k-mers (k = 3 to 5) are counted by count function.
+
+```{r}
+top10_over_B.intestinihominis <- head(sort(kmers_B.intestinihominis[[as.character(k)]], decreasing = TRUE), 10)
+top10_over_B.intestinihominis
+
+top10_under_B.intestinihominis <- head(sort(kmers_B.intestinihominis[[as.character(k)]], decreasing = FALSE), 10)
+top10_under_B.intestinihominis
+```
+
+```{r}
+top10_over_E.coli <- head(sort(kmers_E.coli[[as.character(k)]], decreasing = TRUE), 10)
+top10_over_E.coli
+
+top10_under_E.coli <- head(sort(kmers_E.coli[[as.character(k)]], decreasing = FALSE), 10)
+top10_under_E.coli
+```
+10 protein sequence k-mers of length 3-5 which are the most over- and under-represented k-mers are identified by head command by sorting tge sequences.
+
+```{r}
+sessionInfo()
+```
+
+
