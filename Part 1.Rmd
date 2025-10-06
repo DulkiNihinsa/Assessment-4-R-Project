@@ -2,9 +2,7 @@
 title: "Assessment 4 Part 1"
 author: "Dulki Nihinsa Danthanarayana"
 date: "2025-09-28"
-output:
-  pdf_document: default
-  html_document: default
+output: html_document
 ---
 
 ## Downloading gene_expression.tsv data file 
@@ -166,5 +164,9 @@ mean_growth_southwest
 ```{r}
 t_result <- t.test(Growth_10yr ~ Site, data = growth) 
 t_result
+```
+
+```{r}
+sessionInfo()
 ```
 
